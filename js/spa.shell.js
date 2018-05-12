@@ -1,6 +1,9 @@
 spa.shell = (function () {
   var
     configMap = {
+      anchor_schema_map : {
+        chat : { open : true, closed : true }
+      },
       main_html : String()
         + '<div class="spa-shell-head">'
           + '<div class="spa-shell-head-logo"></div>'
@@ -23,11 +26,107 @@ spa.shell = (function () {
     },
     stateMap  = {
       $container        : null,
+      anchor_map        : {},
       is_chat_retracted : true
     },
     jqueryMap = {},
 
-    setJqueryMap, toggleChat, onClickChat, initModule;
+    copyAnchorMap,    setJqueryMap,   toggleChat,
+    changeAnchorPart, onHashchange,
+    onClickChat,      initModule;
+
+    // Return copy of stored anchor map; minimizes overhead
+    copyAnchorMap = function () {
+      return $.extend( true, {}, stateMap.anchor_map );
+    }
+
+    // Begin Dom Method /changeAnchorPart/
+    changeAnchorPart = function ( arg_map ) {
+      var
+        anchor_map_revise = copyAnchorMap(),
+        bool_return       = true,
+        key_name, key_name_dep;
+
+      // Begin merge changes into anchor arg_map
+      KEYVAL:
+      for ( key_name in arg_map ){
+        if( arg_map.hasOwnProperty( key_name ) ){
+          // skip dependent keys during iteration
+          if ( key_name.indexOf( '_' ) === 0 ) { continue KEYVAL; }
+
+          // update independent key value
+          anchor_map_revise[key_name] = arg_map[key_name];
+
+          // update matching dependent key
+          key_name_dep = '_' + key_name;
+          if( arg_map[key_name_dep] ) {
+            anchor_map_revise[key_name_dep] = arg_map[key_name_dep];
+          }
+          else{
+            delete anchor_map_revise[key_name_dep];
+            delete anchor_map_revise['_s' + key_name_dep];
+          }
+        }
+      }
+      // End merge changes into achcor map
+
+      // Begin attempt to update URI; revert if not successful
+      try {
+        $.uriAnchor.setAnchor( anchor_map_revise );
+      }
+      catch ( error ) {
+        // replace URI with existing stateMap
+        $.uriAnchor.setAnchor( stateMap.anchor_map, null, true );
+        bool_return = false;
+      }
+      // End attempt to update URI
+
+      return bool_return;
+    };
+    // End Dom Method /changeAnchorPart/
+
+    // Begin Event handler /onHashchange/
+    onHashchange = function ( event ) {
+      var
+        anchor_map_previous = copyAnchorMap(),
+        anchor_map_proposed,
+        _a_chat_pervious, _s_chat_proposed,
+        s_chat_proposed;
+
+      // attempt to parse anchor
+      try { anchor_map_proposed = $.uriAnchor.makeAnchorMap(); }
+      catch ( error ) {
+        $.uriAnchor.setAnchor( anchor_map_previous, null, true );
+        return false;
+      }
+      stateMap.anchor_map = anchor_map_proposed;
+
+      // convenience vare
+      _s_chat_previous = anchor_map_previous._s_chat;
+      _s_chat_proposed = anchor_map_proposed._s_chat;
+
+      // Begin adjust chat compoent if changed
+      if ( ! anchor_map_previous || _s_chat_previous !== _s_chat_proposed ) {
+        s_chat_proposed = anchor_map_proposed.chat;
+        switch ( s_chat_proposed ) {
+          case 'open' :
+            toggleChat( true );
+            break;
+          case 'closed' :
+            toggleChat( false );
+            break;
+          default :
+            toggleChat( false );
+            delete anchor_map_proposed.chat;
+            $.uriAnchor.setAnchor( anchor_map_proposed, null, true );
+        }
+      }
+      // End adjust chat compoent if changed
+
+      return false;
+    };
+    // End Event handler /onHashchange/
+
 
     setJqueryMap = function () {
       var $container = stateMap.$container;
@@ -85,9 +184,11 @@ spa.shell = (function () {
     // End Dom Method /toggleChat/
 
     onClickChat = function ( event ) {
-      toggleChat( stateMap.is_chat_retracted );
+      changeAnchorPart({
+        chat : ( stateMap.is_chat_retracted ? 'open' : 'closed' )
+      });
       return false;
-    }
+    };
 
     // Begin Public Method /initModule/
     initModule = function ( $container ) {
@@ -100,6 +201,14 @@ spa.shell = (function () {
       jqueryMap.$chat
         .attr( 'title', configMap.chat_extend_title )
         .click( onClickChat );
+
+      $.uriAnchor.configModule({
+        schema_map : configMap.anchor_schema_map
+      });
+
+      $(window)
+        .bind( 'hashchange', onHashchange )
+        .trigger( 'hashchange' );
     };
     // End Public Method /initModule/
 
