@@ -52,6 +52,7 @@ spa.chat = (function() {
       slider_opened_px  : 0
     },
     jqueryMap = {},
+
     setJqueryMap, getEmSize, setPxSizes, setSliderPosition,
     onClickToggle, configModule, initModule
     ;
@@ -86,6 +87,7 @@ spa.chat = (function() {
   // Begin Dom Method /setPxSizes/
   setPxSizes = function () {
     var px_per_em, opened_height_em;
+    
     px_per_em = getEmSize( jqueryMap.$slider.get(0) );
 
     opened_height_em = configMap.slider_opened_em;
