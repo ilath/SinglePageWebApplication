@@ -29,14 +29,19 @@ spa.shell = (function () {
           + '<div class="spa-shell-main-content"></div>'
         + '</div>'
         + '<div class="spa-shell-foot"></div>'
-        + '<div class="spa-shell-modal"></div>'
+        + '<div class="spa-shell-modal"></div>',
+      resize_interval : 200,
     },
 
-    stateMap  = { anchor_map : {} },
+    stateMap  = {
+      $container  : undefined,
+      anchor_map  : {},
+      resize_idto : undefined
+    },
     jqueryMap = {},
 
     copyAnchorMap,    setJqueryMap,
-    changeAnchorPart, onHashchange,
+    changeAnchorPart, onHashchange, onResize,
     setChatAnchor,    initModule;
   //----------------- END MODULE SCOPE VARIABLES ---------------
 
@@ -190,6 +195,20 @@ spa.shell = (function () {
   // End Event handler /onHashchange/
   //-------------------- END EVENT HANDLERS --------------------
 
+  // Begin Event handler /onResize/
+  onResize = function (){
+    if( stateMap.resize_idto ) { return true; }
+
+    spa.chat.handleResize();
+    stateMap.resize_idto = setTimeout(
+      function (){ stateMap.resize_idto = undefined; },
+      configMap.resize_interval
+    );
+
+    return true;
+  };
+  // End Event handler /onHashchange/
+
   //---------------------- BEGIN CALLBACKS ---------------------
   // Begin callback method /setChatAnchor/
   // Example  : setChatAnchor( 'closed' );
@@ -217,14 +236,14 @@ spa.shell = (function () {
   //   Directs the Shell to offer its capability to the user
   // Arguments :
   //   * $container (example: $('#app_div_id')).
-  //     A jQuery collection that should represent 
+  //     A jQuery collection that should represent
   //     a single DOM container
   // Action    :
   //   Populates $container with the shell of the UI
   //   and then configures and initializes feature modules.
   //   The Shell is also responsible for browser-wide issues
   //   such as URI anchor and cookie management.
-  // Returns   : none 
+  // Returns   : none
   // Throws    : none
   //
   initModule = function ( $container ) {
@@ -253,6 +272,7 @@ spa.shell = (function () {
     // is considered on-load
     //
     $(window)
+      .bind( 'resize', onResize )
       .bind( 'hashchange', onHashchange )
       .trigger( 'hashchange' );
 
