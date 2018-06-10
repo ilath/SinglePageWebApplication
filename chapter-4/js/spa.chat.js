@@ -1,3 +1,5 @@
+/*global $, spa, getComputedStyle */
+
 spa.chat = (function() {
   //---------- BEGIN MODULE SCOPE VARIABLES ----------
   var
@@ -5,19 +7,20 @@ spa.chat = (function() {
       main_html:  String()
         + '<div class="spa-chat">'
           + '<div class="spa-chat-head">'
-            + '<div class="spa-chat-head-toggle">'
+            + '<div class="spa-chat-head-toggle">+</div>'
             + '<div class="spa-chat-head-title">'
               + 'chat'
             + '</div>'
-            + '<div class="spa-chat-closer">x</div>'
-            + '<div class="spa-chat-sizer">'
-              + '<div class="spa-chat-msgs">'
-              + '<div class="spa-chat-box">'
-                + '<input type="text"/>'
-                + '<div>send</div>'
-              + '</div>'
+          + '</div>'
+          + '<div class="spa-chat-closer">x</div>'
+          + '<div class="spa-chat-sizer">'
+            + '<div class="spa-chat-msgs"></div>'
+            + '<div class="spa-chat-box">'
+              + '<input type="text"/>'
+              + '<div>send</div>'
             + '</div>'
-          + '</div>',
+          + '</div>'
+        + '</div>',
 
       settable_map : {
         slider_open_time    : true,
@@ -60,7 +63,7 @@ spa.chat = (function() {
 
     getEmSize = function( elem ) {
       return Number(
-        getComputerStyle( elem, '' ).fontsize.match(/\d*\.?\d*/)[0]
+        getComputedStyle( elem, '' ).fontSize.match(/\d*\.?\d*/)[0]
       );
     };
 
@@ -70,7 +73,7 @@ spa.chat = (function() {
       $append_target = stateMap.$append_target,
       $slider = $append_target.find( '.spa-chat' );
 
-    jqeuryMap = {
+    jqueryMap = {
       $slider : $slider,
       $head   : $slider.find( '.spa-chat-head' ),
       $toggle : $slider.find( '.spa-chat-head-toggle' ),
@@ -87,7 +90,7 @@ spa.chat = (function() {
   // Begin Dom Method /setPxSizes/
   setPxSizes = function () {
     var px_per_em, opened_height_em;
-    
+
     px_per_em = getEmSize( jqueryMap.$slider.get(0) );
 
     opened_height_em = configMap.slider_opened_em;
@@ -96,7 +99,7 @@ spa.chat = (function() {
     stateMap.slider_closed_px = configMap.slider_closed_em * px_per_em;
     stateMap.slider_opened_px = opened_height_em * px_per_em;
 
-    jqeuryMap.$sizer.css({
+    jqueryMap.$sizer.css({
       height : ( opened_height_em - 2 ) * px_per_em
     });
   };
@@ -122,26 +125,30 @@ spa.chat = (function() {
       height_px, animate_time, slider_title, toggle_text;
 
     // return true if slider already in requested position
+    if ( stateMap.position_type === position_type ){
+      return true;
+    }
+
     switch ( position_type ) {
       case 'opened' :
-        height_px = stateMap.slider_opened_px;
-        animate_time = configMap.slider_open_time;
-        slider_title = configMap.slider_opened_title;
-        toggle_text = '=';
+        height_px     = stateMap.slider_opened_px;
+        animate_time  = configMap.slider_open_time;
+        slider_title  = configMap.slider_opened_title;
+        toggle_text   = '=';
       break;
 
       case 'hidden' :
-        height_px = 0;
-        animate_time = configMap.slier_open_time;
-        slider_title = '';
-        toggle_text = '+';
+        height_px     = 0;
+        animate_time  = configMap.slier_open_time;
+        slider_title  = '';
+        toggle_text   = '+';
       break;
 
       case 'closed' :
-        height_px = stateMap.slider_closed_px;
-        animate_time = configMap.slider_close_time;
-        slider_title = configMap.slider_closed_title;
-        toggle_text = '+';
+        height_px     = stateMap.slider_closed_px;
+        animate_time  = configMap.slider_close_time;
+        slider_title  = configMap.slider_closed_title;
+        toggle_text   = '+';
       break;
 
       // bail for unknown position type

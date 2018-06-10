@@ -1,6 +1,6 @@
 .spa-chat {
   position: absolute;
-  border: 0;
+  bottom: 0;
   right: 0;
   width: 25em;
   height: 2em;
@@ -30,7 +30,7 @@
 .spa-chat-head {
   left: 0;
   right: 2em;
-  border-radius: 0.3 0 0 0
+  border-radius: 0.3em 0 0 0;
 }
 
 .spa-chat-closer {
@@ -48,7 +48,7 @@
   left: 0;
   width: 2em;
   bottom: 0;
-  border-radius: 0.3em 0 0 0
+  border-radius: 0.3em 0 0 0;
 }
 
 .spa-chat-head-title {

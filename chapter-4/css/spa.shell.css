@@ -13,13 +13,13 @@
   top: 4px;
   left: 4px;
   height: 32px;
-  width: 32px;
+  width: 128px;
   background: orange;
 }
 
 .spa-shell-head-acct {
   top: 4px;
-  left: 0;
+  right: 0;
   width: 64px;
   height: 32px;
   background: green;
@@ -27,8 +27,8 @@
 
 .spa-shell-head-search {
   top: 4px;
-  right: 0;
-  width: 64px;
+  right: 64px;
+  width: 248px;
   height: 32px;
   background: blue;
 }
