@@ -1,1 +1,1 @@
-spa.avtr = (function () { return (); } () );
+spa.avtr = (function () { return {}; } () );

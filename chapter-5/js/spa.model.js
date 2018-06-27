@@ -1,7 +1,7 @@
 spa.model = ( function () {
   'use strict';
   var
-    configMap = { abon_id : 'a0'},
+    configMap = { anon_id : 'a0'},
     stateMap  = {
       anon_user       : null,
       people_cid_map  : {},
@@ -15,7 +15,7 @@ spa.model = ( function () {
       return this.cid === stateMap.user.cid;
     },
     get_is_anon : function () {
-      return this.cid === configMap.anon_user.cid;
+      return this.cid === stateMap.anon_user.cid;
     }
   };
 
@@ -35,7 +35,7 @@ spa.model = ( function () {
     person.name     = name;
     person.css_map  = css_map;
 
-    if ( id )  { person_id = id; }
+    if ( id )  { person.id = id; }
 
     stateMap.people_cid_map[ cid ] = person;
 

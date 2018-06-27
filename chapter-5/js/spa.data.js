@@ -1,1 +1,1 @@
-spa.data = (function () { return (); } () );
+spa.data = (function () { return {}; } () );
