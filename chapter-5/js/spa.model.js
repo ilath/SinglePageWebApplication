@@ -36,7 +36,7 @@ spa.model = ( function () {
     }
   };
 
-  completeLogin = function () {
+  completeLogin = function ( user_list ) {
     var user_map = user_list[ 0 ];
     delete stateMap.people_cid_map[ user_map.cid ];
     stateMap.user.cid = user_map._id;
@@ -54,7 +54,7 @@ spa.model = ( function () {
         id      = person_map.id,
         name    = person_map.name;
 
-    if ( cid === undefined || ! name) {
+    if ( cid === undefined || ! name ) {
       throw 'client id and name required';
     }
 
@@ -71,7 +71,7 @@ spa.model = ( function () {
     return person;
   };
 
-  removePerson = function () {
+  removePerson = function ( person ) {
     if( ! person ) { return false; }
 
     if( person.id === configMap.anon_id )  {
@@ -131,7 +131,7 @@ spa.model = ( function () {
       login      : login,
       logout     : logout
     };
-  });
+  } ());
 
   initModule = function () {
     var i, people_list, person_map;
