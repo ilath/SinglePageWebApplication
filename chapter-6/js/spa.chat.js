@@ -30,10 +30,6 @@ spa.chat = (function() {
                 + '</form>'
               + '</div>'
             + '</div>'
-            + '<div class="spa-chat-box">'
-              + '<input type="text"/>'
-              + '<div>send</div>'
-            + '</div>'
           + '</div>'
         + '</div>',
 
@@ -42,6 +38,7 @@ spa.chat = (function() {
         slider_close_time   : true,
         slider_opened_em    : true,
         slider_closed_em    : true,
+        slider_opened_title : true,
         slider_closed_title : true,
 
         chat_model      : true,
@@ -81,12 +78,6 @@ spa.chat = (function() {
     configModule,   initModule,
     removeSlider,   handleResize;
     //---------- END MODULE SCOPE VARIABLES ----------
-
-    getEmSize = function( elem ) {
-      return Number(
-        getComputedStyle( elem, '' ).fontSize.match(/\d*\.?\d*/)[0]
-      );
-    };
 
   // Begin Dom Method /setJqueryMap/
   setJqueryMap = function() {
@@ -149,16 +140,16 @@ spa.chat = (function() {
   //    * false - resize not considered
   //    * true  - resize considered
   // Throws : none
-  handleResize = function () {
-    // don't do anything if we don't have a slider $container
-    if ( !jqueryMap.$slider ) { return false; }
-
-    setPxSizes();
-    if( stateMap.position_type === 'opened' ) {
-      jqueryMap.$slider.css({ height : stateMap.slider_opened_px });
-    }
-    return true;
-  };
+  // handleResize = function () {
+  //   // don't do anything if we don't have a slider $container
+  //   if ( !jqueryMap.$slider ) { return false; }
+  //
+  //   setPxSizes();
+  //   if( stateMap.position_type === 'opened' ) {
+  //     jqueryMap.$slider.css({ height : stateMap.slider_opened_px });
+  //   }
+  //   return true;
+  // };
   // End public method /handleResize/
 
   // Begin public method /setSliderPosition/
@@ -217,40 +208,7 @@ spa.chat = (function() {
 
       // bail for unknown position type
       default: return false;
-
     }
-
-    scrollChat = function () {
-      var $msg_log = jqueryMap.$msg_log;
-      $msg_log.animate( {
-        scrollTop : $msg_log.prop( 'scrollHeight' ) - $msg_log.height()
-      }, 150);
-    };
-
-    writeChat = function ( person_name, text, is_user ) {
-      var msg_class = is_user ? 'spa-chat-msg-log-me' : 'spa-chat-msg-log-msg';
-
-      jqeuryMap.$msg_log.append(
-        '<div class="' + msg_class + '">'
-        + spa.util_b.encodeHtml(person_name) + '：'
-        + spa.util_b.encodeHtml(text) + '</div>'
-      );
-
-      scrollChat();
-    };
-
-    writeAlert = function ( alert_text ) {
-      jqueryMap.$msg_log.append(
-        '<div class="spa-chat-msg-log-alert">'
-        + spa.util_b.encodeHtml( alert_text )
-        + '</div>'
-      );
-      scrollChat();
-    }
-
-    clearChat = function () { jqueryMap.$msg_log.empty(); };
-
-
 
     // animate slider position change
     stateMap.position_type = '';
@@ -267,6 +225,37 @@ spa.chat = (function() {
     return true;
   };
 
+
+  scrollChat = function () {
+    var $msg_log = jqueryMap.$msg_log;
+    $msg_log.animate( {
+      scrollTop : $msg_log.prop( 'scrollHeight' ) - $msg_log.height()
+    }, 150);
+  };
+
+  writeChat = function ( person_name, text, is_user ) {
+    var msg_class = is_user ? 'spa-chat-msg-log-me' : 'spa-chat-msg-log-msg';
+
+    jqeuryMap.$msg_log.append(
+      '<div class="' + msg_class + '">'
+      + spa.util_b.encodeHtml(person_name) + '：'
+      + spa.util_b.encodeHtml(text) + '</div>'
+    );
+
+    scrollChat();
+  };
+
+  writeAlert = function ( alert_text ) {
+    jqueryMap.$msg_log.append(
+      '<div class="spa-chat-msg-log-alert">'
+      + spa.util_b.encodeHtml( alert_text )
+      + '</div>'
+    );
+    scrollChat();
+  };
+
+  clearChat = function () { jqueryMap.$msg_log.empty(); };
+
   onTapToggle = function ( event ) {
     var set_chat_anchor = configMap.set_chat_anchor;
     if ( stateMap.position_type === 'opened' ) {
@@ -274,7 +263,8 @@ spa.chat = (function() {
     }
     else if ( stateMap.position_type === 'closed' ) {
       set_chat_anchor( 'opened' );
-    } return false;
+    }
+    return false;
   };
 
   onSubmitMsg = function ( event ) {
@@ -288,7 +278,7 @@ spa.chat = (function() {
       250
     );
     return false;
-  }
+  };
 
   onTapList = function ( event ) {
     var $tapped = $ ( event.elem_target ), chatee_id;
@@ -332,7 +322,7 @@ spa.chat = (function() {
 
   onListchange = function ( event ) {
     var
-      vlist_html = String(),
+      list_html = String(),
       people_db  = configMap.people_model.get_db(),
       chatee     = configMap.chat_model.get_chatee();
 
@@ -345,9 +335,9 @@ spa.chat = (function() {
         select_class = 'spa-x-select';
       }
       list_html
-        += '<div class="spa-chat-list-name">'
-        + select_class + '"data-id="' + person_id + '">'
-        + spa.util_b.encodeHtml( person_name ) + '</div>';
+        += '<div class="spa-chat-list-name'
+        + select_class + '"data-id="' + person.id + '">'
+        + spa.util_b.encodeHtml( person.name ) + '</div>';
     });
 
     if ( ! list_html ) {
@@ -462,10 +452,10 @@ spa.chat = (function() {
     $.gevent.subscribe( $list_box, 'spa-login',           onLogin );
     $.gevent.subscribe( $list_box, 'spa-logout',         onLogout );
 
-    jqeuryMap.$head.bind(     'utap', onTapToggle );
-    jqeuryMap.$list_box.bind( 'utap', onTapList   );
-    jqeuryMap.$send.bind(     'utap', onSubmitMsg );
-    jqeuryMap.$form.bind(   'submit', onSubmitMsg );
+    jqueryMap.$head.bind(     'utap', onTapToggle );
+    jqueryMap.$list_box.bind( 'utap', onTapList   );
+    jqueryMap.$send.bind(     'utap', onSubmitMsg );
+    jqueryMap.$form.bind(   'submit', onSubmitMsg );
   };
   // End public method /initModule/
 
@@ -496,6 +486,17 @@ spa.chat = (function() {
     return true;
   };
   // End public method /removeSlider/
+
+  handleResize = function () {
+    // don't do anything if we don't have a slider container
+    if ( ! jqueryMap.$slider ) { return false; }
+
+    setPxSizes();
+    if ( stateMap.position_type === 'opened' ){
+      jqueryMap.$slider.css({ height : stateMap.slider_opened_px });
+    }
+    return true;
+  };
 
   // return public Method
   return {

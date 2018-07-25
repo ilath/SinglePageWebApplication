@@ -141,7 +141,8 @@ spa.model = ( function () {
       _publish_listchange, _publish_updatechat,
       _update_list, _leave_chat,
 
-      get_chatee, join_chat, send_msg, set_chatee,
+      get_chatee, join_chat, send_msg,
+      set_chatee, update_avatar,
 
       chatee = null;
 

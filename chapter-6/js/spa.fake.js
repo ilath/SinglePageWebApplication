@@ -41,9 +41,10 @@ spa.fake = (function () {
 
 
   mockSio = (function() {
-    var on_sio, emit_sio, emit_mock_msg,
-        send_listchange, listchange_idto,
-        callback_map = {};
+    var
+      on_sio, emit_sio, emit_mock_msg,
+      send_listchange, listchange_idto,
+      callback_map = {};
 
     on_sio = function ( msg_type, callback ) {
       callback_map[ msg_type ] = callback;
