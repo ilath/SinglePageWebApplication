@@ -29,7 +29,7 @@ spa.model = ( function () {
 
   clearPeopleDb = function () {
     var user = stateMap.user;
-    stateMap.people_db = TAFFY();
+    stateMap.people_db      = TAFFY();
     stateMap.people_cid_map = {};
     if ( user ) {
       stateMap.people_db.insert( user );
@@ -59,7 +59,7 @@ spa.model = ( function () {
       throw 'client id and name required';
     }
 
-    person = Object.create( personProto );
+    person          = Object.create( personProto );
     person.cid      = cid;
     person.name     = name;
     person.css_map  = css_map;
@@ -119,12 +119,10 @@ spa.model = ( function () {
       var user = stateMap.user;
 
       chat._leave();
-      is_removed    = removePerson( user );
       stateMap.user = stateMap.anon_user;
       clearPeopleDb();
 
       $.gevent.publish( 'spa-logout', [ user ] );
-      return is_removed;
     };
 
     return {
@@ -163,23 +161,21 @@ spa.model = ( function () {
           stateMap.user.css_map = person_map.css_map;
           continue PERSON;
         }
+
+        make_person_map = {
+          cid     : person_map._id,
+          css_map : person_map.css_map,
+          id      : person_map._id,
+          name    : person_map.name
+        };
+
+        person = makePerson( make_person_map );
+
+        if( chatee && chatee.id === make_person_map.id ){
+          is_chatee_online = true;
+          chatee = person;
+        }
       }
-
-      make_person_map = {
-        cid     : person_map._id,
-        css_map : person_map.css_map,
-        id      : person_map._id,
-        name    : person_map.name
-      };
-
-      person = makePerson( make_person_map );
-
-      if( chatee && chatee.id === make_person_map.id ){
-        is_chatee_online = true;
-        chatee = person;
-      }
-
-      makePerson( make_person_map );
 
       stateMap.people_db.sort( 'name' );
 
