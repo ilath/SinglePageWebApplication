@@ -10,7 +10,7 @@ spa.model = ( function () {
       people_db       : TAFFY(),
       user            : null
     },
-    isFakeData = true,
+    isFakeData = false,
     personProto, makeCid, clearPeopleDb, completeLogin,
     makePerson, removePerson, people, chat, initModule;
 
@@ -237,7 +237,7 @@ spa.model = ( function () {
         msg_text  : msg_text
       };
 
-      _public_updatechat( [ msg_map ] );
+      _publish_updatechat( [ msg_map ] );
       sio.emit( 'updatechat', msg_map );
       return true;
     };
