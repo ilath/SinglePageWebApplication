@@ -1,0 +1,12 @@
+{
+  "name": "SPA",
+  "version": "0.0.3",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "method-override": "^3.0.0",
+    "mongodb": "^3.2.3",
+    "socket.io": "^2.2.0"
+  }
+}
